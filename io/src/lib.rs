@@ -2,9 +2,8 @@
 //! hello
 use gmeta::{In, InOut, Metadata, Out};
 use gstd::prelude::*;
-use gstd::{Encode, Decode}; // Import necessary functions
+use gstd::{Decode, Encode}; // Import necessary functions
 use scale_info::TypeInfo; // Import TypeInfo derive macro (assuming you're using scale-info)
-
 
 pub struct PebblesMetadata;
 
@@ -16,7 +15,7 @@ impl Metadata for PebblesMetadata {
     type Others = ();
     type Signal = ();
 }
-/// pub struct PebblesInit 
+/// pub struct PebblesInit
 #[derive(Debug, Default, Clone, Encode, Decode, TypeInfo)]
 pub struct PebblesInit {
     pub difficulty: DifficultyLevel,
