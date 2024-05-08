@@ -2,7 +2,7 @@
 //! hello
 use gmeta::{In, InOut, Metadata, Out};
 use gstd::prelude::*;
-use gstd::{Encode, Decode}; // Import necessary functions
+use gstd::{Decode, Encode}; // Import necessary functions
 use scale_info::TypeInfo; // Import TypeInfo derive macro (assuming you're using scale-info)
 
 
