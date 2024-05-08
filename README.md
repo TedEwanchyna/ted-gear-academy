@@ -1,6 +1,6 @@
 # ted-gear-academy
 ## The Pebble game assignment Task Description
-
+##
 ### The games rules are the following:
 
    There are two players: User and Program. The first player is chosen randomly.
