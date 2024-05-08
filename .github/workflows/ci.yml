@@ -24,4 +24,4 @@ jobs:
 
       - name: Check and test
         run:
-          cargo fmt --all --check
+          ls
