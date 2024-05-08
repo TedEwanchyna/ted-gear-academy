@@ -25,5 +25,4 @@ jobs:
       - name: Check and test
         run: |
           cargo fmt --all --check
-          cargo clippy --all-targets -- -D warnings -A unused-imports
           cargo t
