@@ -23,5 +23,5 @@ jobs:
           targets: wasm32-unknown-unknown
 
       - name: Check and test
-        run: |
+        run:
           cargo fmt --all --check
