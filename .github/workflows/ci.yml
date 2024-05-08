@@ -27,7 +27,7 @@ jobs:
       - name: Check and test
         run: |
           echo "hi"
-          echo " there"
+          echo `which cargo`
           #cargo fmt --all --check
           #cargo clippy --all-targets -- -D warnings -A unused-imports
           #cargo t          
