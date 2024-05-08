@@ -3,7 +3,11 @@ use crate::scale_info::prelude::time::UNIX_EPOCH;
 use gstd::*;
 use gtest::{Log, Program, System};
 use pebbles_game_io::*;
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> a1b898423edd881d80c7ec577170b022369eb5ae
 const ADMIN: u64 = 100;
 const MAX_NUMBER_OF_TURNS: u32 = 21; // for loop counter
 const MAX_PEBBLES_PER_TURN: u32 = 2;
@@ -297,4 +301,5 @@ fn success_run_game() {
     }
     assert_eq!(pebbles_remaining, 0);
     assert!(winner == Player::Program || winner == Player::User);
+    assert(true);
 }
