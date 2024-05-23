@@ -141,8 +141,8 @@ pub fn restart_game(
         winner: None, //Some(Player::User),
     };
     if first_player == Player::Program {
-        let program_turn = get_pebbles_to_remove(&mut pebbles_game);
-        pebbles_game.pebbles_remaining -= program_turn;
+        let pebbles_to_remove = get_pebbles_to_remove(&mut pebbles_game);
+        pebbles_game.pebbles_remaining -= pebbles_to_remove;
     }
     //println!("{:?}", pebbles_game);
     if DEBUG_ME {
@@ -177,7 +177,7 @@ extern "C" fn handle() {
         PebblesAction::GiveUp => {
             // we got a winner and it ain't you
             pebbles_game.winner = Some(Player::Program);
-            let _result = msg::reply(
+            let _ = msg::reply(
                 PebblesEvent::Won(pebbles_game.winner.as_ref().expect("winner").clone()),
                 0,
             ); // stop game, communicate results
@@ -190,7 +190,7 @@ extern "C" fn handle() {
         } => {
             // bail, no winner, just start again
             restart_game(difficulty.clone(), pebbles_count, max_pebbles_per_turn);
-            let _result = msg::reply(
+            let _ = msg::reply(
                 PebblesInit {
                     difficulty,
                     pebbles_count,
@@ -273,7 +273,7 @@ extern "C" fn handle() {
     let mut _pebbles_count = unsafe { COUNTER };
 }
 
-/// Provide feedback to the client code, via the get_state() function.
+/// Provide feedback to the client code, via the read_state() function.
 #[no_mangle]
 extern "C" fn state() {
     let pebbles_game = unsafe { PEBBLES_GAME.take().expect("Error in taking current state") };
@@ -288,18 +288,13 @@ mod tests {
 
     #[test]
     fn test_check_pebbles_input() {
-        let res: bool = check_pebbles_input(0, 0);
-        assert!(!res);
-        let res: bool = check_pebbles_input(15, 16);
-        assert!(!res);
-        let res: bool = check_pebbles_input(15, 2);
-        assert!(res);
+        assert!(!check_pebbles_input(0, 0));
+        assert!(!check_pebbles_input(15, 16));
+        assert!(check_pebbles_input(15, 2));
     }
     #[test]
     fn test_check_difficulty_level() {
-        let res: bool = check_difficulty_level(DifficultyLevel::Easy);
-        assert!(res);
-        let res: bool = check_difficulty_level(DifficultyLevel::Hard);
-        assert!(res);
+        assert!(check_difficulty_level(DifficultyLevel::Easy));
+        assert!(check_difficulty_level(DifficultyLevel::Hard));
     }
 }
