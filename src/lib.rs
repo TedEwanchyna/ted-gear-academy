@@ -200,77 +200,74 @@ extern "C" fn handle() {
             );
             //exec::leave();
         }
-        PebblesAction::Turn(mut x) => {
-            // Player::User
-            if x > pebbles_game.max_pebbles_per_turn {
-                x = pebbles_game.max_pebbles_per_turn;
-            }
-            if x < pebbles_game.pebbles_remaining {
-                pebbles_game.pebbles_remaining -= x;
-            } else {
-                pebbles_game.pebbles_remaining = 0;
-            }
+       PebblesAction::Turn(mut pebbles_to_remove) => {
+            let player_turn = Player::User;
+            do_user_turn(pebbles_to_remove, pebbles_game);
+            remove_pebbles(pebbles_to_remove, pebbles_game);
+            do_turn(pebbles_game, player_turn);
             if DEBUG_ME {
-                debug!("handle(user count): {:?}", x);
-            }
-            if pebbles_game.pebbles_remaining == 0 {
-                // we got a winner and it's you
-                // stop game, communicate results
-                pebbles_game.winner = Some(Player::User);
-                if DEBUG_ME {
-                    debug!("user is the winner");
-                }
-                let _result = msg::reply(
-                    PebblesEvent::Won(pebbles_game.winner.as_ref().expect("winner").clone()),
-                    0,
-                ); // stop game, communicate results
-                exec::leave();
-                //exec::exit(msg::source());
-            } else {
-                //msg::reply(PebblesEvent::CounterTurn(pebbles_game.pebbles_remaining, 0));
+                debug!("handle(user count): {:?}", pebbles_to_remove);
             }
             if DEBUG_ME {
                 debug!("handle(): {:?}", pebbles_game);
             }
-            // Player::Program
-            let program_turn = get_pebbles_to_remove(&mut pebbles_game);
+            let player_turn = Player::Program;
+            pebbles_to_remove = get_pebbles_to_remove(&mut pebbles_game);
             if DEBUG_ME {
-                debug!("handle(program count): {:?}", program_turn);
+                debug!("handle(program count): {:?}", pebbles_to_remove);
             }
-            if program_turn < pebbles_game.pebbles_remaining {
-                pebbles_game.pebbles_remaining -= program_turn;
-            } else {
-                pebbles_game.pebbles_remaining = 0;
-            }
-            if pebbles_game.pebbles_remaining == 0 {
-                // we got a winner and it's not you
-                // stop game, communicate results
-                pebbles_game.winner = Some(Player::Program);
-                if DEBUG_ME {
-                    debug!("program is the winner");
-                }
-                let _result = msg::reply(
-                    PebblesEvent::Won(pebbles_game.winner.as_ref().expect("winner").clone()),
-                    0,
-                ); // stop game, communicate results
-                exec::leave();
-                //exec::exit(msg::source());
-            } else {
-                if DEBUG_ME {
-                    debug!(
-                        "handle(): CounterTurn pebbles_remaining{:?}",
-                        pebbles_game.pebbles_remaining
-                    );
-                }
-                let _result =
-                    msg::reply(PebblesEvent::CounterTurn(pebbles_game.pebbles_remaining), 0);
-            }
+            remove_pebbles(pebbles_to_remove, pebbles_game);
+            do_turn(pebbles_game, player_turn);
             if DEBUG_ME {
                 debug!("handle(): {:?}", pebbles_game);
             }
         }
     };
     let mut _pebbles_count = unsafe { COUNTER };
+}
+
+fn remove_pebbles(pebbles_to_remove: u32, pebbles_game: &mut GameState) {
+    if pebbles_to_remove < pebbles_game.pebbles_remaining {
+        pebbles_game.pebbles_remaining -= pebbles_to_remove;
+    } else {
+        pebbles_game.pebbles_remaining = 0;
+    }
+}
+fn do_user_turn(mut pebbles_to_remove: u32, pebbles_game: &mut GameState) {
+    //  don't let user chooses more than they should
+//debug!("pebbles_to_remove {pebbles_to_remove}");
+//pebbles_to_remove = 4;
+debug!("pebbles_to_remove {pebbles_to_remove}");
+debug!("pebbles_game.max_pebbles_per_turn {0}", pebbles_game.max_pebbles_per_turn);
+    if pebbles_to_remove > pebbles_game.max_pebbles_per_turn {
+        pebbles_to_remove = pebbles_game.max_pebbles_per_turn;
+    }
+debug!("pebbles_to_remove {pebbles_to_remove}");
+}
+fn do_turn(pebbles_game: &mut GameState, player_turn: Player) {
+    if pebbles_game.pebbles_remaining == 0 {
+        // we got a winner
+        // stop game, communicate results
+        pebbles_game.winner = Some(player_turn);
+        if DEBUG_ME {
+            //    debug!("{player_turn} is the winner");
+        }
+        let _ = msg::reply(
+            PebblesEvent::Won(pebbles_game.winner.as_ref().expect("winner").clone()),
+            0,
+        ); // stop game, communicate results
+        exec::leave();
+        //exec::exit(msg::source());
+    } else {
+        if DEBUG_ME {
+            debug!(
+                "handle(): CounterTurn pebbles_remaining{:?}",
+                pebbles_game.pebbles_remaining
+            );
+        }
+        // only do this for game turn?
+        let _ = msg::reply(PebblesEvent::CounterTurn(pebbles_game.pebbles_remaining), 0);
+    }
 }
 
 /// Provide feedback to the client code, via the read_state() function.
